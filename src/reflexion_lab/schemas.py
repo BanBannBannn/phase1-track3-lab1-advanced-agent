@@ -14,13 +14,21 @@ class QAExample(BaseModel):
     context: list[ContextChunk]
 
 class JudgeResult(BaseModel):
-    # TODO: Học viên định nghĩa các trường cần thiết cho kết quả đánh giá (score, reason, ...)
-    pass
+    # Đảm bảo có 'score' và 'reason' vì AttemptTrace đang gọi judge.score và judge.reason
+    score: int = Field(..., description="Điểm đánh giá chất lượng (ví dụ: 0 hoặc 1)")
+    reason: str = Field(..., description="Lý do chi tiết (critique) giải thích tại sao đạt mức điểm này")
+    is_perfect: bool = Field(default=False, description="Cờ đánh dấu câu trả lời đã hoàn hảo chưa")
 
 class ReflectionEntry(BaseModel):
-    # TODO: Học viên định nghĩa các trường cần thiết cho một mục reflection (attempt_id, lesson, strategy, ...)
-    pass
-
+    attempt_id: int
+    failure_reason: str = Field(default="", description="Lý do chi tiết (critique) giải thích tại sao đạt mức điểm này")
+    lesson: str = Field(default="", description="Bài học rút ra từ lỗi sai (root cause)")
+    strategy: str = Field(default="", description="Chiến thuật/hành động cụ thể cho lượt thử tiếp theo")
+    
+    # Optional: If you still want 'content', make it optional or give it a default value
+    # so Pydantic doesn't crash if mock_runtime.py omits it.
+    content: str = Field(default="", description="Toàn bộ nội dung trả về từ Reflector")
+    
 class AttemptTrace(BaseModel):
     attempt_id: int
     answer: str

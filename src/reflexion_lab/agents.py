@@ -30,8 +30,18 @@ class BaseAgent:
             
             # TODO: Học viên triển khai logic Reflexion tại đây
             # 1. Kiểm tra nếu agent_type là 'reflexion' và chưa hết số lần attempt
-            # 2. Gọi hàm reflector để lấy nội dung reflection
-            # 3. Cập nhật reflection_memory để Actor dùng cho lần sau
+            if self.agent_type == "reflexion" and attempt_id < self.max_attempts:
+                # 1. Truyền đúng attempt_id và toàn bộ object judge
+                reflection_entry = reflector(example, attempt_id, judge)
+                
+                # 2. Hàm reflector đã trả về sẵn một object ReflectionEntry, 
+                # nên ta append trực tiếp vào list
+                reflections.append(reflection_entry)
+                
+                # 3. Cập nhật reflection_memory để Actor dùng cho lần sau.
+                # (Ép kiểu về string để đưa vào prompt)
+                memory_text = f"Lesson: {reflection_entry.lesson}. Strategy: {reflection_entry.strategy}"
+                reflection_memory.append(memory_text)
             pass
             traces.append(trace)
         total_tokens = sum(t.token_estimate for t in traces)
